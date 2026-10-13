@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#14bec4">
+    <meta name="description" content="Control sencillo de productos y existencias.">
+    <title>Inventario | Stockly</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icon.png">
+    <link rel="stylesheet" href="./styles.css?v=31">
+    <script src="./config.js" defer></script>
+    <script src="./app.js?v=31" defer></script>
+  </head>
+  <body>
+    <main class="auth-screen" id="auth-screen">
+      <section class="auth-card">
+        <header class="auth-card-header">
+          <a class="brand auth-brand" href="#" aria-label="Stockly, inicio">
+            <span class="brand-mark" aria-hidden="true"><img src="./brand-symbol.png" alt=""></span>
+            <span>Stockly</span>
+          </a>
+          <button class="button button-secondary theme-toggle auth-theme-toggle" type="button" aria-label="Cambiar a modo oscuro" aria-pressed="false">
+            <span class="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Modo oscuro</span>
+          </button>
+        </header>
+        <div class="auth-card-content">
+          <section id="auth-main">
+            <p class="eyebrow">INVENTARIO EN LA NUBE</p>
+            <h1 id="auth-title">Inicia sesión</h1>
+            <p class="auth-subtitle" id="auth-subtitle">Accede a tus productos desde cualquiera de tus dispositivos.</p>
+            <form id="auth-form">
+              <label class="field">Correo electrónico<input id="auth-email" type="email" autocomplete="email" required maxlength="254" placeholder="tu@correo.com"></label>
+              <label class="field">Contraseña
+                <span class="password-control">
+                  <input id="auth-password" type="password" autocomplete="current-password" required minlength="8" maxlength="128" placeholder="Mínimo 8 caracteres">
+                  <button class="password-visibility" type="button" data-password-toggle="auth-password" aria-label="Mostrar contraseña" aria-pressed="false">◉</button>
+                </span>
+              </label>
+              <label class="field" id="confirm-password-field" hidden>Confirmar contraseña
+                <span class="password-control">
+                  <input id="confirm-auth-password" type="password" autocomplete="new-password" minlength="8" maxlength="128" placeholder="Repite tu contraseña">
+                  <button class="password-visibility" type="button" data-password-toggle="confirm-auth-password" aria-label="Mostrar contraseña de confirmación" aria-pressed="false">◉</button>
+                </span>
+              </label>
+              <p class="form-error" id="auth-error" role="alert"></p>
+              <button class="button button-primary auth-submit" id="auth-submit" type="submit">Iniciar sesión</button>
+            </form>
+            <button class="auth-link" id="forgot-password-button" type="button">¿Olvidaste tu contraseña?</button>
+            <button class="auth-toggle" id="auth-toggle" type="button">¿No tienes cuenta? Crear una</button>
+          </section>
+          <section id="security-setup" hidden>
+            <p class="eyebrow">PROTEGE TU CUENTA</p>
+            <h1 id="security-setup-title">Preguntas de seguridad</h1>
+            <p class="auth-subtitle" id="security-setup-subtitle">Configura dos respuestas para verificar tu identidad antes de enviarte un enlace de recuperación por correo.</p>
+            <form id="security-setup-form">
+              <label class="field">Pregunta 1<select id="setup-question-one" required></select></label>
+              <label class="field">Respuesta 1<input id="setup-answer-one" required minlength="2" maxlength="120" autocomplete="off"></label>
+              <label class="field">Pregunta 2<select id="setup-question-two" required></select></label>
+              <label class="field">Respuesta 2<input id="setup-answer-two" required minlength="2" maxlength="120" autocomplete="off"></label>
+              <p class="form-error" id="security-setup-error" role="alert"></p>
+              <button class="button button-primary auth-submit" id="security-setup-submit" type="submit">Guardar preguntas</button>
+            </form>
+            <button class="auth-toggle" id="security-cancel-button" type="button" hidden>Volver</button>
+          </section>
+          <section id="forgot-panel" hidden>
+            <p class="eyebrow">RECUPERAR ACCESO</p>
+            <h1>Restablecer contraseña</h1>
+            <p class="auth-subtitle">Escribe el correo de tu cuenta para continuar.</p>
+            <form id="forgot-email-form">
+              <label class="field">Correo electrónico<input id="forgot-email" type="email" autocomplete="email" required maxlength="254" placeholder="tu@correo.com"></label>
+              <p class="form-error" id="forgot-error" role="alert"></p>
+              <button class="button button-primary auth-submit" id="forgot-continue" type="submit">Continuar</button>
+            </form>
+            <form id="forgot-challenge-form" hidden>
+              <p class="auth-subtitle">Selecciona las preguntas que configuraste e ingresa tus respuestas.</p>
+              <label class="field">Pregunta 1<select id="forgot-select-one" required></select></label>
+              <label class="field">Respuesta 1<input id="forgot-answer-one" required minlength="2" maxlength="120" autocomplete="off"></label>
+              <label class="field">Pregunta 2<select id="forgot-select-two" required></select></label>
+              <label class="field">Respuesta 2<input id="forgot-answer-two" required minlength="2" maxlength="120" autocomplete="off"></label>
+              <p class="form-error" id="forgot-challenge-error" role="alert"></p>
+              <button class="button button-primary auth-submit" id="forgot-submit" type="submit">Verificar y enviar enlace</button>
+            </form>
+            <button class="auth-link" id="forgot-back-button" type="button">Volver a iniciar sesión</button>
+          </section>
+          <section id="password-reset-panel" hidden>
+            <p class="eyebrow">RECUPERAR ACCESO</p>
+            <h1>Crear contraseña nueva</h1>
+            <p class="auth-subtitle">Elige una contraseña de al menos 8 caracteres.</p>
+            <form id="password-reset-form">
+              <label class="field">Nueva contraseña<input id="new-password" type="password" autocomplete="new-password" required minlength="8" maxlength="128"></label>
+              <label class="field">Confirma la contraseña<input id="confirm-password" type="password" autocomplete="new-password" required minlength="8" maxlength="128"></label>
+              <p class="form-error" id="password-reset-error" role="alert"></p>
+              <button class="button button-primary auth-submit" id="password-reset-submit" type="submit">Guardar contraseña</button>
+            </form>
+          </section>
+          <p class="auth-footnote">Cada usuario tiene su propio inventario independiente. Tus productos y movimientos solo son visibles para tu cuenta.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="app-shell" id="app-shell" hidden>
+      <aside class="sidebar" aria-label="Navegación principal">
+        <a class="brand" href="#" aria-label="Stockly, inicio">
+          <span class="brand-mark" aria-hidden="true"><img src="./brand-symbol.png" alt=""></span>
+          <span>Stockly</span>
+        </a>
+        <p class="nav-label">MENÚ</p>
+        <nav class="main-nav">
+          <a class="nav-link active" href="#view-inventory" data-view-link="inventory" aria-current="page">
+            <span class="nav-icon" aria-hidden="true">▦</span> Inventario
+          </a>
+          <a class="nav-link" href="#view-kardex" data-view-link="kardex">
+            <span class="nav-icon" aria-hidden="true">↕</span> Kárdex
+          </a>
+          <a class="nav-link" href="#view-entry" data-view-link="entry">
+            <span class="nav-icon" aria-hidden="true">＋</span> Ingreso
+          </a>
+          <a class="nav-link" href="#view-warehouses" data-view-link="warehouses">
+            <span class="nav-icon" aria-hidden="true">▤</span> Almacenes
+          </a>
+          <a class="nav-link" href="#view-delivery" data-view-link="delivery">
+            <span class="nav-icon" aria-hidden="true">⇧</span> Nota de entrega
+          </a>
+          <a class="nav-link" href="#view-reports" data-view-link="reports">
+            <span class="nav-icon" aria-hidden="true">▤</span> Reportes
+          </a>
+          <a class="nav-link" href="#view-settings" data-view-link="settings">
+            <span class="nav-icon" aria-hidden="true">⚙</span> Configuración
+          </a>
+        </nav>
+        <div class="sidebar-note">
+          <span class="online-dot"></span>
+          <div><strong>Sincronizado</strong><small>Base de datos en la nube</small></div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="inventory">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Workspace</span><span class="crumb-divider">/</span><strong>Inventario</strong></div>
+          <div class="user-controls">
+            <select class="inventory-selector" id="inventory-selector" aria-label="Inventario activo" hidden></select>
+            <button class="button button-secondary" id="inventory-invitations-button" type="button" hidden>Invitaciones</button>
+            <button class="button button-secondary" id="manage-inventory-button" type="button">Compartir</button>
+            <button class="button button-secondary theme-toggle" type="button" aria-label="Cambiar a modo oscuro" aria-pressed="false">
+              <span class="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Modo oscuro</span>
+            </button>
+            <span class="user-email" id="user-email"></span>
+            <button class="button button-secondary signout-button" id="signout-button" type="button">Cerrar sesión</button>
+          </div>
+        </header>
+
+        <section class="app-view" id="view-inventory" data-view="inventory">
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">GESTIÓN DE BODEGA</p>
+            <h1>Inventario</h1>
+            <p class="page-subtitle">Controla tus productos y mantén tus existencias al día.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="button button-secondary" id="export-pdf-button" type="button">
+              <span aria-hidden="true">▤</span> Exportar PDF
+            </button>
+            <button class="button button-secondary" id="export-button" type="button">
+              <span aria-hidden="true">↓</span> Exportar
+            </button>
+            <button class="button button-primary" id="add-product-button" type="button">
+              <span aria-hidden="true">＋</span> Nuevo producto
+            </button>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="Resumen del inventario">
+          <article class="stat-card">
+            <div class="stat-top"><span>Total de productos</span><span class="stat-icon purple" aria-hidden="true">▦</span></div>
+            <div class="stat-value" id="stat-products">0</div>
+            <div class="stat-foot">Productos registrados</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Unidades en stock</span><span class="stat-icon blue" aria-hidden="true">◫</span></div>
+            <div class="stat-value" id="stat-units">0</div>
+            <div class="stat-foot">Unidades disponibles</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Stock bajo</span><span class="stat-icon orange" aria-hidden="true">⌁</span></div>
+            <div class="stat-value" id="stat-low">0</div>
+            <div class="stat-foot">Productos para reponer</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Valor del inventario</span><span class="stat-icon green" aria-hidden="true">$</span></div>
+            <div class="stat-value" id="stat-value">$0</div>
+            <div class="stat-foot">Según costo por unidad</div>
+          </article>
+        </section>
+
+        <section class="panel inventory-panel" aria-labelledby="inventory-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="inventory-title">Productos</h2>
+              <p>Administra los artículos de tu inventario.</p>
+            </div>
+            <label class="search-box">
+              <span aria-hidden="true">⌕</span>
+              <input id="search-input" type="search" placeholder="Buscar producto..." aria-label="Buscar producto">
+              <kbd>⌘ K</kbd>
+            </label>
+          </div>
+          <div class="toolbar">
+            <label class="select-wrap">
+              <span class="visually-hidden">Filtrar por categoría</span>
+              <select id="category-filter" aria-label="Filtrar por categoría">
+                <option value="">Todas las categorías</option>
+              </select>
+            </label>
+            <span class="result-count" id="result-count">0 productos</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">PRODUCTO</th>
+                  <th scope="col">SKU</th>
+                  <th scope="col">CATEGORÍA</th>
+                  <th scope="col">COSTO UNITARIO</th>
+                  <th scope="col">STOCK</th>
+                  <th scope="col">ESTADO</th>
+                  <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                </tr>
+              </thead>
+              <tbody id="product-list"></tbody>
+            </table>
+            <div class="empty-state" id="empty-state">
+              <span class="empty-icon" aria-hidden="true">▦</span>
+              <h3 id="empty-title">Tu inventario está listo</h3>
+              <p id="empty-message">Agrega tu primer producto para empezar a llevar el control de tus existencias.</p>
+              <button class="button button-primary" id="empty-add-button" type="button">＋ Agregar producto</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel movements-panel" id="movements" aria-labelledby="movements-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="movements-title">Movimientos recientes</h2>
+              <p>Últimas entradas y salidas de productos.</p>
+            </div>
+            <button class="button button-secondary" id="add-movement-button" type="button">＋ Registrar movimiento</button>
+          </div>
+          <div class="movement-list" id="movement-list"></div>
+        </section>
+        </section>
+
+        <section class="app-view" id="view-kardex" data-view="kardex" hidden>
+          <section class="page-heading">
+            <div>
+              <p class="eyebrow">CONTROL DE EXISTENCIAS</p>
+              <h1>Kárdex</h1>
+              <p class="page-subtitle">Historial cronológico de entradas y salidas por producto.</p>
+            </div>
+            <button class="button button-secondary" id="export-kardex-button" type="button">↓ Exportar Kárdex</button>
+          </section>
+          <section class="panel">
+            <div class="panel-heading">
+              <div><h2>Movimientos de inventario</h2><p id="kardex-count">Consulta y filtra el historial.</p></div>
+            </div>
+            <div class="toolbar filter-toolbar">
+              <label class="field filter-field">Producto<select id="kardex-product-filter"><option value="">Todos los productos</option></select></label>
+              <label class="field filter-field">Tipo<select id="kardex-type-filter"><option value="">Entradas y salidas</option><option value="in">Entradas</option><option value="out">Salidas</option></select></label>
+              <label class="field filter-field">Desde<input type="date" id="kardex-from"></label>
+              <label class="field filter-field">Hasta<input type="date" id="kardex-to"></label>
+              <button class="button button-secondary" id="kardex-filter-button" type="button">Filtrar</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table warehouse-stock-table">
+                <thead><tr><th>FECHA</th><th>PRODUCTO</th><th>ALMACÉN</th><th>TIPO</th><th>DOCUMENTO</th><th>CONTACTO</th><th>ENTRADA</th><th>SALIDA</th><th>SALDO</th><th>DETALLE</th></tr></thead>
+                <tbody id="kardex-list"></tbody>
+              </table>
+              <div class="movement-empty" id="kardex-empty" hidden>No hay movimientos para los filtros seleccionados.</div>
+            </div>
+          </section>
+        </section>
+
+        <section class="app-view" id="view-entry" data-view="entry" hidden>
+          <section class="page-heading">
+            <div><p class="eyebrow">ABASTECIMIENTO</p><h1>Ingreso de mercancía</h1><p class="page-subtitle">Registra compras y entradas para actualizar existencias.</p></div>
+          </section>
+          <section class="panel form-panel">
+            <div class="panel-heading">
+              <div><h2>Datos del ingreso</h2><p>El cambio de stock y el movimiento se guardan juntos.</p></div>
+              <button class="button button-secondary" id="entry-add-product-button" type="button"><span aria-hidden="true">＋</span> Crear producto</button>
+            </div>
+            <form id="stock-entry-form" class="operation-form">
+              <div class="form-grid">
+                <label class="field field-wide">Producto<select id="entry-product" required></select></label>
+                <label class="field field-wide">Almacén de destino<select id="entry-warehouse" required></select></label>
+                <label class="field">Cantidad recibida<input id="entry-quantity" type="number" min="1" step="1" required value="1"></label>
+                <label class="field">Proveedor<input id="entry-counterparty" maxlength="100" placeholder="Nombre del proveedor"></label>
+                <label class="field">N.º de factura o referencia<input id="entry-reference" maxlength="60" placeholder="Ej. FAC-00231"></label>
+                <label class="field field-wide">Observaciones<input id="entry-note" maxlength="100" placeholder="Detalle del ingreso (opcional)"></label>
+              </div>
+              <p class="form-error" id="entry-error" role="alert"></p>
+              <div class="form-actions"><button class="button button-primary" type="submit">Registrar ingreso</button></div>
+            </form>
+          </section>
+        </section>
+
+        <section class="app-view" id="view-warehouses" data-view="warehouses" hidden>
+          <section class="page-heading">
+            <div><p class="eyebrow">UBICACIONES DE STOCK</p><h1>Almacenes</h1><p class="page-subtitle">Consulta las existencias por ubicación y transfiere artículos entre almacenes.</p></div>
+            <button class="button button-primary" id="add-warehouse-button" type="button">＋ Nuevo almacén</button>
+          </section>
+          <section class="panel">
+            <div class="panel-heading">
+              <div><h2 id="warehouse-view-title">Existencias por almacén</h2><p id="warehouse-view-summary">Selecciona una ubicación para consultar sus artículos.</p></div>
+              <label class="field warehouse-filter">Almacén<select id="warehouse-filter" aria-label="Almacén para consultar"></select></label>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>PRODUCTO</th><th>SKU</th><th>CATEGORÍA</th><th>EN ESTE ALMACÉN</th><th>STOCK TOTAL</th><th></th></tr></thead>
+                <tbody id="warehouse-stock-list"></tbody>
+              </table>
+              <div class="movement-empty" id="warehouse-stock-empty" hidden>No hay artículos con existencias en este almacén.</div>
+            </div>
+          </section>
+        </section>
+
+        <section class="app-view" id="view-delivery" data-view="delivery" hidden>
+          <section class="page-heading">
+            <div><p class="eyebrow">SALIDA DE MERCANCÍA</p><h1>Nota de entrega</h1><p class="page-subtitle">Prepara una entrega: valida existencias y descuenta todos los productos en una sola operación.</p></div>
+          </section>
+          <section class="panel form-panel">
+            <div class="panel-heading"><div><h2>Nueva nota de entrega</h2><p>El stock solo se descuenta cuando la nota se guarda correctamente.</p></div></div>
+            <form id="delivery-form" class="operation-form">
+              <div class="form-grid">
+                <label class="field field-wide">Cliente o destinatario<input id="delivery-customer" required maxlength="100" placeholder="Nombre de quien recibe"></label>
+                <label class="field field-wide">Observaciones<input id="delivery-note" maxlength="200" placeholder="Detalle de la entrega (opcional)"></label>
+              </div>
+              <div class="delivery-items-heading"><h3>Productos</h3><button class="button button-secondary" id="add-delivery-item" type="button">＋ Agregar producto</button></div>
+              <div id="delivery-items" class="delivery-items"></div>
+              <p class="form-error" id="delivery-error" role="alert"></p>
+              <div class="form-actions"><button class="button button-primary" type="submit">Crear nota de entrega</button></div>
+            </form>
+          </section>
+          <section class="panel latest-delivery" id="latest-delivery" hidden>
+            <div class="panel-heading"><div><h2>Nota creada</h2><p id="latest-delivery-summary"></p></div><button class="button button-secondary" id="print-delivery-button" type="button">Imprimir nota</button></div>
+          </section>
+        </section>
+
+        <section class="app-view" id="view-reports" data-view="reports" hidden>
+          <section class="page-heading">
+            <div><p class="eyebrow">ANÁLISIS DE INVENTARIO</p><h1>Reportes</h1><p class="page-subtitle">Consulta existencias y movimientos por rango de fechas.</p></div>
+            <button class="button button-secondary" id="export-report-button" type="button">↓ Exportar reporte</button>
+          </section>
+          <section class="panel">
+            <div class="toolbar report-toolbar">
+              <label class="field filter-field">Desde<input type="date" id="report-from" required></label>
+              <label class="field filter-field">Hasta<input type="date" id="report-to" required></label>
+              <button class="button button-primary" id="run-report-button" type="button">Generar reporte</button>
+              <span class="report-period" id="report-period"></span>
+            </div>
+          </section>
+          <section class="stats-grid report-stats" aria-label="Resumen del reporte">
+            <article class="stat-card"><div class="stat-top"><span>Entradas del período</span><span class="stat-icon green" aria-hidden="true">↓</span></div><div class="stat-value" id="report-in">0</div><div class="stat-foot">Unidades recibidas</div></article>
+            <article class="stat-card"><div class="stat-top"><span>Salidas del período</span><span class="stat-icon orange" aria-hidden="true">↑</span></div><div class="stat-value" id="report-out">0</div><div class="stat-foot">Unidades entregadas</div></article>
+            <article class="stat-card"><div class="stat-top"><span>Productos activos</span><span class="stat-icon blue" aria-hidden="true">▦</span></div><div class="stat-value" id="report-products">0</div><div class="stat-foot">En el inventario actual</div></article>
+            <article class="stat-card"><div class="stat-top"><span>Valor actual</span><span class="stat-icon purple" aria-hidden="true">$</span></div><div class="stat-value" id="report-value">$0</div><div class="stat-foot">Existencias × costo</div></article>
+          </section>
+          <section class="panel">
+            <div class="panel-heading"><div><h2>Existencias actuales</h2><p>Productos que requieren reposición y saldo disponible.</p></div></div>
+            <div class="table-wrap"><table class="data-table"><thead><tr><th>PRODUCTO</th><th>SKU</th><th>STOCK ACTUAL</th><th>MÍNIMO</th><th>ESTADO</th><th>VALOR EN COSTO</th></tr></thead><tbody id="report-stock-list"></tbody></table><div class="movement-empty" id="report-stock-empty" hidden>No hay productos registrados.</div></div>
+          </section>
+        </section>
+
+        <section class="app-view" id="view-settings" data-view="settings" hidden>
+          <section class="page-heading">
+            <div>
+              <p class="eyebrow">TU CUENTA</p>
+              <h1>Configuración</h1>
+              <p class="page-subtitle">Edita tu perfil y administra la contraseña de acceso.</p>
+            </div>
+          </section>
+          <section class="panel form-panel">
+            <div class="panel-heading">
+              <div><h2>Perfil</h2><p>Actualiza el nombre que identifica tu cuenta y tu correo de acceso.</p></div>
+            </div>
+            <form id="profile-form" class="operation-form">
+              <div class="form-grid">
+                <label class="field field-wide">Nombre<input id="profile-name" maxlength="80" autocomplete="name" placeholder="Tu nombre"></label>
+                <label class="field field-wide">Correo electrónico<input id="profile-email" type="email" required maxlength="254" autocomplete="email"></label>
+              </div>
+              <p class="field-hint">Para cambiar el correo, Supabase puede solicitar confirmación en la dirección nueva y en la actual.</p>
+              <p class="form-error" id="profile-error" role="alert"></p>
+              <div class="form-actions"><button class="button button-primary" id="profile-submit" type="submit">Guardar perfil</button></div>
+            </form>
+          </section>
+          <section class="panel form-panel settings-password-panel">
+            <div class="panel-heading">
+              <div><h2>Cambiar contraseña</h2><p>Confirma tu contraseña actual y elige una nueva de al menos 8 caracteres.</p></div>
+            </div>
+            <form id="change-password-form" class="operation-form">
+              <div class="form-grid">
+                <label class="field field-wide">Contraseña actual<input id="current-password" type="password" required minlength="8" maxlength="128" autocomplete="current-password"></label>
+                <label class="field">Nueva contraseña<input id="settings-new-password" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+                <label class="field">Confirmar nueva contraseña<input id="settings-confirm-password" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+              </div>
+              <p class="form-error" id="change-password-error" role="alert"></p>
+              <div class="form-actions"><button class="button button-primary" id="change-password-submit" type="submit">Actualizar contraseña</button></div>
+            </form>
+          </section>
+        </section>
+
+        <footer class="page-footer">Stockly <span>·</span> Inventario sincronizado en la nube.</footer>
+      </main>
+    </div>
+
+    <dialog class="modal" id="product-modal" aria-labelledby="product-modal-title">
+      <form id="product-form">
+        <div class="modal-heading">
+          <div><p class="eyebrow">CATÁLOGO</p><h2 id="product-modal-title">Nuevo producto</h2></div>
+          <button class="icon-button" type="button" data-close="product-modal" aria-label="Cerrar">×</button>
+        </div>
+        <input id="product-id" type="hidden">
+        <div class="form-grid">
+          <label class="field field-wide">Nombre del producto<input id="product-name" name="name" required maxlength="80" placeholder="Ej. Café molido"></label>
+          <label class="field">SKU / Código<input id="product-sku" name="sku" maxlength="40" placeholder="Ej. CAF-001"></label>
+          <label class="field">Categoría<input id="product-category" name="category" maxlength="40" placeholder="Ej. Bebidas"></label>
+          <label class="field field-wide" id="product-warehouse-field">Almacén de existencias iniciales<select id="product-warehouse" name="default_warehouse_id" required></select></label>
+          <label class="field">Costo por unidad<input id="product-cost" name="cost" type="number" min="0" step="0.01" value="0" required></label>
+          <label class="field">Existencias<input id="product-stock" name="stock" type="number" min="0" step="1" value="0" required><small id="stock-hint" class="field-hint"></small></label>
+          <label class="field">Avisar cuando queden<input id="product-minimum" name="minimum" type="number" min="0" step="1" value="5" required></label>
+        </div>
+        <p class="form-error" id="product-error" role="alert"></p>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" data-close="product-modal">Cancelar</button>
+          <button class="button button-primary" type="submit">Guardar producto</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal modal-small" id="movement-modal" aria-labelledby="movement-modal-title">
+      <form id="movement-form">
+        <div class="modal-heading">
+          <div><p class="eyebrow">EXISTENCIAS</p><h2 id="movement-modal-title">Registrar movimiento</h2></div>
+          <button class="icon-button" type="button" data-close="movement-modal" aria-label="Cerrar">×</button>
+        </div>
+        <label class="field">Producto<select id="movement-product" required></select></label>
+        <label class="field">Almacén<select id="movement-warehouse" required></select></label>
+        <div class="form-grid movement-fields">
+          <label class="field">Tipo<select id="movement-type"><option value="in">Entrada</option><option value="out">Salida</option></select></label>
+          <label class="field">Cantidad<input id="movement-quantity" type="number" min="1" step="1" value="1" required></label>
+        </div>
+        <small id="movement-warehouse-stock" class="field-hint"></small>
+        <label class="field">Nota <span class="optional">(opcional)</span><input id="movement-note" maxlength="100" placeholder="Ej. Compra a proveedor"></label>
+        <p class="form-error" id="movement-error" role="alert"></p>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" data-close="movement-modal">Cancelar</button>
+          <button class="button button-primary" type="submit">Guardar movimiento</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal modal-small" id="warehouse-modal" aria-labelledby="warehouse-modal-title">
+      <form id="warehouse-form">
+        <div class="modal-heading">
+          <div><p class="eyebrow">UBICACIONES DE STOCK</p><h2 id="warehouse-modal-title">Crear almacén</h2></div>
+          <button class="icon-button" type="button" data-close="warehouse-modal" aria-label="Cerrar">×</button>
+        </div>
+        <label class="field">Nombre del almacén<input id="warehouse-name" required maxlength="80" placeholder="Ej. Bodega central"></label>
+        <p class="form-error" id="warehouse-error" role="alert"></p>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" data-close="warehouse-modal">Cancelar</button>
+          <button class="button button-primary" type="submit">Crear almacén</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal modal-small" id="warehouse-transfer-modal" aria-labelledby="warehouse-transfer-title">
+      <form id="warehouse-transfer-form">
+        <div class="modal-heading">
+          <div><p class="eyebrow">MOVIMIENTO INTERNO</p><h2 id="warehouse-transfer-title">Transferir artículos</h2></div>
+          <button class="icon-button" type="button" data-close="warehouse-transfer-modal" aria-label="Cerrar">×</button>
+        </div>
+        <label class="field">Producto<select id="transfer-product" required></select></label>
+        <div class="form-grid">
+          <label class="field">Desde<select id="transfer-from" required></select></label>
+          <label class="field">Hacia<select id="transfer-to" required></select></label>
+        </div>
+        <label class="field">Cantidad<input id="transfer-quantity" type="number" min="1" step="1" value="1" required></label>
+        <p class="form-error" id="warehouse-transfer-error" role="alert"></p>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" data-close="warehouse-transfer-modal">Cancelar</button>
+          <button class="button button-primary" type="submit">Transferir stock</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal delivery-print-modal" id="delivery-preview" aria-labelledby="delivery-preview-title">
+      <div class="modal-actions no-print"><button class="button button-secondary" id="close-delivery-preview" type="button">Cerrar</button><button class="button button-primary" id="print-preview-button" type="button">Imprimir</button></div>
+      <article id="delivery-print" class="delivery-document"></article>
+    </dialog>
+
+    <dialog class="modal modal-small" id="inventory-sharing-modal" aria-labelledby="inventory-sharing-title">
+      <div class="modal-heading">
+        <div><p class="eyebrow">ACCESO COMPARTIDO</p><h2 id="inventory-sharing-title">Compartir inventario</h2></div>
+        <button class="icon-button" type="button" data-close="inventory-sharing-modal" aria-label="Cerrar">×</button>
+      </div>
+      <p class="auth-subtitle">Invita a una cuenta Stockly existente. Podrá consultar y modificar productos, existencias, movimientos y notas.</p>
+      <form id="inventory-invite-form">
+        <label class="field">Correo de la cuenta<input id="inventory-invite-email" type="email" required maxlength="254" placeholder="persona@correo.com"></label>
+        <p class="form-error" id="inventory-invite-error" role="alert"></p>
+        <button class="button button-primary" id="inventory-invite-submit" type="submit">Enviar invitación</button>
+      </form>
+      <section class="sharing-list-section">
+        <h3>Personas con acceso</h3>
+        <div id="inventory-members-list" class="sharing-list"></div>
+      </section>
+      <section class="sharing-list-section">
+        <h3>Invitaciones pendientes</h3>
+        <div id="inventory-pending-list" class="sharing-list"></div>
+      </section>
+    </dialog>
+
+    <dialog class="modal modal-small" id="inventory-invitations-modal" aria-labelledby="inventory-invitations-title">
+      <div class="modal-heading">
+        <div><p class="eyebrow">INVENTARIO COMPARTIDO</p><h2 id="inventory-invitations-title">Invitaciones recibidas</h2></div>
+        <button class="icon-button" type="button" data-close="inventory-invitations-modal" aria-label="Cerrar">×</button>
+      </div>
+      <p class="auth-subtitle">Al aceptar, podrás consultar y modificar el inventario compartido desde el selector de inventario.</p>
+      <div id="received-invitations-list" class="sharing-list"></div>
+    </dialog>
+
+    <main id="inventory-print-report" class="inventory-print-report" hidden></main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

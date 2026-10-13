@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "Stockly · Inventario",
+  "short_name": "Stockly",
+  "description": "Control sencillo de productos y existencias.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f7fb",
+  "theme_color": "#14bec4",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
